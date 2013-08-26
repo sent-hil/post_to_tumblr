@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 
+	"io/ioutil"
 	"net/smtp"
 	"os"
 	"strings"
@@ -42,30 +42,42 @@ func main() {
 		panic(err)
 	}
 
-	username := flag.String("u", "", "Gmail username")
+	from := flag.String("f", "", "Gmail username")
 	password := flag.String("p", "", "Gmail password")
 	flag.Parse()
 
 	var subject string
 	splitFileNames := strings.Split(lastFile.Name(), ".")
-	if len(splitFileNames) == 0 {
+	if len(splitFileNames) > 0 {
 		subject = splitFileNames[0]
 	} else {
 		subject = ""
 	}
 
-	err = sendEmail(*username, *password, subject, string(contents))
+	err = sendEmail(*from, *password, subject, string(contents))
 	if err != nil {
 		panic(err)
 	}
 }
 
-func sendEmail(username, password, title, body string) error {
-	contents := []byte(fmt.Sprintf("Subject:%s \n %s", title, body))
-	auth := smtp.PlainAuth("", username, password, "smtp.gmail.com")
+func sendEmail(from, password, subject, body string) error {
+	header := make(map[string]string)
+	header["From"] = from
+	header["To"] = tumblrEmail
+	header["Subject"] = subject
+	header["MIME-Version"] = "1.0"
+
+	message := ""
+	for k, v := range header {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+
+	message = fmt.Sprintf("%s\n%s", message, body)
 	to := []string{tumblrEmail}
 
-	err := smtp.SendMail("smtp.gmail.com:587", auth, username, to, contents)
+	auth := smtp.PlainAuth("", from, password, "smtp.gmail.com")
+
+	err := smtp.SendMail("smtp.gmail.com:587", auth, from, to, []byte(message))
 	if err != nil {
 		return err
 	}
