@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-
 	"io/ioutil"
 	"net/smtp"
 	"os"
@@ -61,11 +60,12 @@ func main() {
 }
 
 func sendEmail(from, password, subject, body string) error {
-	header := make(map[string]string)
-	header["From"] = from
-	header["To"] = tumblrEmail
-	header["Subject"] = subject
-	header["MIME-Version"] = "1.0"
+	header := map[string]string{
+		"From":         from,
+		"To":           tumblrEmail,
+		"Subject":      subject,
+		"MIME-Version": "1.0",
+	}
 
 	message := ""
 	for k, v := range header {
