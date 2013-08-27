@@ -69,6 +69,9 @@ func main() {
 }
 
 func sendEmail(from, password, subject, body string) error {
+	// tumblr looks for !m in subject so it can parse the email as markdown
+	subject = subject + " !m"
+
 	header := map[string]string{
 		"From":         from,
 		"To":           tumblrEmail,
