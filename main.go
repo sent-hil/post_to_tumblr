@@ -91,7 +91,7 @@ func sendEmail(from, password, subject, body string) error {
 		return err
 	}
 
-	log.Println("email sent to %v", tumblrEmail)
+	log.Printf("email sent to %v", tumblrEmail)
 
 	return nil
 }
