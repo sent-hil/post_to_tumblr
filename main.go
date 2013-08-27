@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/smtp"
 	"os"
 	"strings"
@@ -33,7 +34,9 @@ func main() {
 		panic(err)
 	}
 
-	lastFile := postsDir[len(postsDir)-1]
+	var numberOfPosts int = len(postsDir)
+
+	lastFile := postsDir[numberOfPosts-1]
 	fullFileName := fmt.Sprintf("posts/%v", lastFile.Name())
 
 	contents, err := ioutil.ReadFile(fullFileName)
@@ -45,15 +48,21 @@ func main() {
 	password := flag.String("p", "", "Gmail password")
 	flag.Parse()
 
-	var subject string
-	splitFileNames := strings.Split(lastFile.Name(), ".")
-	if len(splitFileNames) > 0 {
-		subject = splitFileNames[0]
-	} else {
-		subject = ""
+	var fileName string = lastFile.Name()
+	var nameWithoutExtension string
+	var joinedTitle string
+
+	splitFileNames := strings.Split(fileName, ".")
+	nameWithoutExtension = splitFileNames[0]
+
+	splitFileNames = strings.Split(nameWithoutExtension, "_")
+	for _, str := range splitFileNames[1:] {
+		joinedTitle += fmt.Sprintf("%s ", str)
 	}
 
-	err = sendEmail(*from, *password, subject, string(contents))
+	log.Printf("parsed title: %s from file %s", joinedTitle, fileName)
+
+	err = sendEmail(*from, *password, joinedTitle, string(contents))
 	if err != nil {
 		panic(err)
 	}
@@ -81,6 +90,8 @@ func sendEmail(from, password, subject, body string) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println("email sent to %v", tumblrEmail)
 
 	return nil
 }
@@ -110,6 +121,8 @@ func readFromPostDir() ([]os.FileInfo, error) {
 	if len(postsDir) == 0 {
 		return nil, errors.New(fmt.Sprintf("no post files in %s directory", postsDirName))
 	}
+
+	log.Printf("found %v posts in dir %s", len(postsDir), postsDirName)
 
 	return postsDir, nil
 }
