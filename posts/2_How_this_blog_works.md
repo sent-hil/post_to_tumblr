@@ -12,4 +12,7 @@ from/username, i.e. your email address and -p flag for password. You didn't
 think I'd hardcode my email and password, did you? Run it like you'd do any Go
 script `go run main.go -f <from> -p <password>`
 
+The script itself is no means complete, but it works. This and the last
+post were posted using it.
+
 [1]: https://github.com/sent-hil/post_to_tumblr/blob/master/main.go
