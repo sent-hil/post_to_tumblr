@@ -12,9 +12,13 @@ import (
 )
 
 const (
-	logFileName  string = "_.log"
+	logFileName string = "_.log"
+
+	// put your posts in this dir
 	postsDirName string = "posts"
-	tumblrEmail  string = "j8r8uvvjtpjn8@tumblr.com"
+
+	// this is my tumblr email address, you probably can't use this
+	tumblrEmail string = "j8r8uvvjtpjn8@tumblr.com"
 )
 
 func main() {
@@ -51,6 +55,8 @@ func main() {
 	}
 }
 
+// In the future when this script will be run via cron job, this log file
+// will be useful.
 func readOrCreateLogFile() (*os.File, error) {
 	logFile, err := os.Open(logFileName)
 	if err != nil {
@@ -82,6 +88,10 @@ func readFromPostDir() ([]os.FileInfo, error) {
 	return postsDir, nil
 }
 
+// Posts are expected to be in `1_Hello_world.md` format. First number
+// indicates order. Everything after that till `.md` is assumed to be
+// post title. This parses the _ and . and provides a human friendly
+// title from the file.
 func extractTitleFromFileName(fileName string) string {
 	var nameWithoutExtension string
 	var joinedTitle string
@@ -99,6 +109,7 @@ func extractTitleFromFileName(fileName string) string {
 	return joinedTitle
 }
 
+// Sends email via Gmail.
 func sendEmail(subject, body string) error {
 	from := flag.String("f", "", "Gmail username")
 	password := flag.String("p", "", "Gmail password")
@@ -109,7 +120,7 @@ func sendEmail(subject, body string) error {
 
 	header := map[string]string{
 		"From":         *from,
-		"To":           tumblrEmail,
+		"To":           tumblrEmail, // required for email to reach
 		"Subject":      subject,
 		"MIME-Version": "1.0",
 	}
