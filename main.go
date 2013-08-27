@@ -48,7 +48,15 @@ func main() {
 	password := flag.String("p", "", "Gmail password")
 	flag.Parse()
 
-	var fileName string = lastFile.Name()
+	joinedTitle := extractTitleFromFileName(lastFile.Name())
+
+	err = sendEmail(*from, *password, joinedTitle, string(contents))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func extractTitleFromFileName(fileName string) string {
 	var nameWithoutExtension string
 	var joinedTitle string
 
@@ -62,10 +70,7 @@ func main() {
 
 	log.Printf("parsed title: %s from file %s", joinedTitle, fileName)
 
-	err = sendEmail(*from, *password, joinedTitle, string(contents))
-	if err != nil {
-		panic(err)
-	}
+	return joinedTitle
 }
 
 func sendEmail(from, password, subject, body string) error {
